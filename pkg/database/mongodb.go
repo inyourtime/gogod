@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"gogod/config"
-	"log"
+	"gogod/pkg/logger"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,13 +16,13 @@ func MongoDBConnect(cfg *config.Env) *mongo.Client {
 	// create connection pool
 	MC, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.Db.Mongo.Uri))
 	if err != nil {
-		log.Fatalf("Connect to mongodb fail: %v", err)
+		logger.Error(err)
 	}
 	// Test ping to mongodb server
 	if err = MC.Ping(context.TODO(), nil); err != nil {
-		log.Fatalf("Ping to mongodb error: %v", err)
+		logger.Error(err)
 	}
-	log.Println("Mongodb has been initialize")
+	logger.Info("Mongodb has been initialize")
 	return MC
 }
 

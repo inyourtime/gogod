@@ -5,16 +5,19 @@ import (
 	"gogod/config"
 	"gogod/delivery/route"
 	"gogod/pkg/database"
+	"gogod/pkg/logger"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	_flogger "github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
 	// load config
 	cfg := config.LoadConfig()
+	_ = logger.NewLogger(cfg)
+
 	// connect database
 	mc := database.MongoDBConnect(cfg)
 	defer mc.Disconnect(context.TODO())
@@ -29,7 +32,7 @@ func main() {
 		AllowOrigins: "*",
 		AllowMethods: cors.ConfigDefault.AllowMethods,
 	}))
-	app.Use(logger.New(logger.Config{
+	app.Use(_flogger.New(_flogger.Config{
 		TimeZone: "Asia/Bangkok",
 	}))
 
