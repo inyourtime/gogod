@@ -3,6 +3,9 @@ package usecase
 import (
 	"gogod/domain"
 	"gogod/model"
+
+	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type userUsecase struct {
@@ -16,5 +19,18 @@ func NewUserUsecase(ur domain.UserRepository) domain.UserUsecase {
 }
 
 func (u *userUsecase) GetProfile(id string) (*model.User, error) {
-	return nil, nil
+	// retrive object_id
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid object id")
+	}
+	// retrive user
+	currentUser, err := u.userRepo.GetByID(objectID, false)
+	if err != nil {
+		return nil, err
+	}
+	if currentUser == nil {
+		return nil, fiber.ErrNotFound
+	}
+	return currentUser, nil
 }

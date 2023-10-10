@@ -6,7 +6,6 @@ import (
 	"gogod/model"
 	"gogod/usecase"
 	"testing"
-	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gofiber/fiber/v2"
@@ -122,6 +121,7 @@ func TestRegister(t *testing.T) {
 	mockPassword := gofakeit.Password(true, true, true, true, false, 10)
 	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
 	mockUserRegistered := model.User{
+		ID:        primitive.NewObjectID(),
 		Provider:  mockProvider,
 		Email:     mockEmail,
 		Password:  string(mockPasswordHash),
@@ -129,8 +129,8 @@ func TestRegister(t *testing.T) {
 		Lastname:  mockLastname,
 		Role:      mockUserRole,
 		IsActive:  true,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: gofakeit.Date(),
+		UpdatedAt: gofakeit.Date(),
 	}
 
 	mockAuthRepo := new(mock.AuthRepository)
