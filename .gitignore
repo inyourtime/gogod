@@ -1,7 +1,6 @@
 *.env
 
 go.sum
-Makefile
 tmp
 *.sh
 
