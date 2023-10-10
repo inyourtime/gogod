@@ -9,6 +9,12 @@ type DiscordErrorLog struct {
 	Timestamp string `json:"timestamp"`
 }
 
+// WebhookSend sends a text message to a Discord webhook.
+//
+// Parameters:
+// - webhookID: the ID of the webhook.
+// - webhookToken: the token of the webhook.
+// - text: the text message to send.
 func WebhookSend(webhookID, webhookToken, text string) {
 	dc, _ := discordgo.New("Bot")
 	defer dc.Close()
