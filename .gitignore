@@ -1,0 +1,10 @@
+*.env
+
+go.sum
+Makefile
+tmp
+*.sh
+
+.DS_Store
+.vscode/
+*.log
