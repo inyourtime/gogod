@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-faker/faker/v4"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,26 +16,26 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	mockEmail := faker.Email()
-	mockPassword := faker.Password()
+	mockEmail := gofakeit.Email()
+	mockPassword := gofakeit.Password(true, true, true, true, false, 10)
 	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
 	mockUser := model.User{
 		ID:        primitive.NewObjectID(),
 		Provider:  model.LocalProvider,
 		Email:     mockEmail,
 		Password:  string(mockPasswordHash),
-		Firstname: faker.FirstName(),
-		Lastname:  faker.LastName(),
+		Firstname: gofakeit.FirstName(),
+		Lastname:  gofakeit.LastName(),
 		Role:      model.UserRole,
 		IsActive:  true,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: gofakeit.Date(),
+		UpdatedAt: gofakeit.Date(),
 	}
 
 	t.Run("Login success", func(t *testing.T) {
 		mockAuthRepo := new(mock.AuthRepository)
 		mockUserRepo := new(mock.UserRepository)
-		mockAuthRepo.On("SignUserToken").Return(&model.Token{AccessToken: faker.Jwt(), RefreshToken: faker.Jwt()}, nil)
+		mockAuthRepo.On("SignUserToken").Return(&model.Token{AccessToken: gofakeit.LetterN(20), RefreshToken: gofakeit.LetterN(20)}, nil)
 		mockUserRepo.On("GetByEmail").Return(&mockUser, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
@@ -86,7 +86,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(&mockUser, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: faker.Password()})
+		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 10)})
 
 		assert.Nil(t, result)
 		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
@@ -109,6 +109,100 @@ func TestLogin(t *testing.T) {
 		assert.Error(t, err)
 
 		mockAuthRepo.AssertExpectations(t)
+		mockUserRepo.AssertExpectations(t)
+	})
+}
+
+func TestRegister(t *testing.T) {
+	mockEmail := gofakeit.Email()
+	mockFirstname := gofakeit.FirstName()
+	mockLastname := gofakeit.LastName()
+	mockProvider := model.LocalProvider
+	mockUserRole := model.UserRole
+	mockPassword := gofakeit.Password(true, true, true, true, false, 10)
+	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
+	mockUserRegistered := model.User{
+		Provider:  mockProvider,
+		Email:     mockEmail,
+		Password:  string(mockPasswordHash),
+		Firstname: mockFirstname,
+		Lastname:  mockLastname,
+		Role:      mockUserRole,
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	mockAuthRepo := new(mock.AuthRepository)
+
+	t.Run("Register success", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("GetByEmail").Return(nil, nil)
+		mockUserRepo.On("Create").Return(&mockUserRegistered, nil)
+		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
+
+		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, mockUserRegistered, *result)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Register fail: get user repo error", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("GetByEmail").Return(nil, errors.New("repo error"))
+		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
+
+		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+
+		assert.Nil(t, result)
+		assert.Error(t, err)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Register fail: email exist", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("GetByEmail").Return(&mockUserRegistered, nil)
+		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
+
+		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+
+		assert.Nil(t, result)
+		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
+			assert.Equal(t, fiber.StatusUnprocessableEntity, err.(*fiber.Error).Code)
+		}
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Register fail: gen password error", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("GetByEmail").Return(nil, nil)
+		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
+
+		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 80), Firstname: mockFirstname, Lastname: mockLastname})
+
+		assert.Nil(t, result)
+		assert.Error(t, err)
+		assert.ErrorIs(t, err, bcrypt.ErrPasswordTooLong)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Register fail: create repo error", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("GetByEmail").Return(nil, nil)
+		mockUserRepo.On("Create").Return(nil, errors.New("repo error"))
+		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
+
+		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+
+		assert.Nil(t, result)
+		assert.Error(t, err)
+
 		mockUserRepo.AssertExpectations(t)
 	})
 }

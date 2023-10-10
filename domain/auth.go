@@ -10,4 +10,5 @@ type AuthRepository interface {
 
 type AuthUsecase interface {
 	Login(req model.AuthLoginRequest) (*model.AuthLoginResponse, error)
+	Register(req model.User) (*model.User, error)
 }

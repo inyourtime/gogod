@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"gogod/config"
 	"gogod/delivery/route"
 	"gogod/pkg/database"
 	"log"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -37,8 +35,6 @@ func main() {
 
 	// register route
 	route.SetupRoute(app)
-
-	fmt.Println(faker.Password())
 
 	log.Fatal(app.Listen(":" + cfg.App.ServerPort))
 }
