@@ -38,7 +38,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(&mockUser, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
+		result, err := u.Login(&model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, result)
@@ -55,7 +55,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(nil, errors.New("repo error"))
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
+		result, err := u.Login(&model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
 
 		assert.Error(t, err)
 		assert.Nil(t, result)
@@ -69,7 +69,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(nil, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
+		result, err := u.Login(&model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
 
 		assert.Nil(t, result)
 		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
@@ -85,7 +85,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(&mockUser, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 10)})
+		result, err := u.Login(&model.AuthLoginRequest{Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 10)})
 
 		assert.Nil(t, result)
 		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
@@ -102,7 +102,7 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(&mockUser, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Login(model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
+		result, err := u.Login(&model.AuthLoginRequest{Email: mockEmail, Password: mockPassword})
 
 		assert.Nil(t, result)
 		assert.Error(t, err)
@@ -141,7 +141,7 @@ func TestRegister(t *testing.T) {
 		mockUserRepo.On("Create").Return(&mockUserRegistered, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+		result, err := u.Register(&model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
@@ -155,7 +155,7 @@ func TestRegister(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(nil, errors.New("repo error"))
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+		result, err := u.Register(&model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
 
 		assert.Nil(t, result)
 		assert.Error(t, err)
@@ -168,7 +168,7 @@ func TestRegister(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(&mockUserRegistered, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+		result, err := u.Register(&model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
 
 		assert.Nil(t, result)
 		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
@@ -183,7 +183,7 @@ func TestRegister(t *testing.T) {
 		mockUserRepo.On("GetByEmail").Return(nil, nil)
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 80), Firstname: mockFirstname, Lastname: mockLastname})
+		result, err := u.Register(&model.User{Provider: mockProvider, Email: mockEmail, Password: gofakeit.Password(true, true, true, true, false, 80), Firstname: mockFirstname, Lastname: mockLastname})
 
 		assert.Nil(t, result)
 		assert.Error(t, err)
@@ -198,7 +198,7 @@ func TestRegister(t *testing.T) {
 		mockUserRepo.On("Create").Return(nil, errors.New("repo error"))
 		u := usecase.NewAuthUsecase(mockAuthRepo, mockUserRepo)
 
-		result, err := u.Register(model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
+		result, err := u.Register(&model.User{Provider: mockProvider, Email: mockEmail, Password: mockEmail, Firstname: mockFirstname, Lastname: mockLastname})
 
 		assert.Nil(t, result)
 		assert.Error(t, err)

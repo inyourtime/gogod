@@ -20,5 +20,8 @@ func SetupRoute(app *fiber.App) {
 	api := app.Group("/api")
 
 	// register here
-	AuthRoute(api)
+	{
+		authRoute(api)
+		userRoute(api)
+	}
 }

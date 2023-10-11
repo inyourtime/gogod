@@ -2,7 +2,9 @@ package delivery
 
 import (
 	"gogod/domain"
+	"gogod/model"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,5 +19,18 @@ func NewAuthHandler(au domain.AuthUsecase) *authHandler {
 }
 
 func (h *authHandler) Login(c *fiber.Ctx) error {
-	return c.JSON("login")
+	req := new(model.AuthLoginRequest)
+	if err := c.BodyParser(req); err != nil {
+		return FiberError(c, fiber.NewError(fiber.StatusBadRequest, err.Error()))
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return FiberError(c, err)
+	}
+
+	res, err := h.authUsecase.Login(req)
+	if err != nil {
+		return FiberError(c, err)
+	}
+	return c.JSON(res)
 }

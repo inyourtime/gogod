@@ -21,7 +21,7 @@ func NewAuthUsecase(ar domain.AuthRepository, ur domain.UserRepository) domain.A
 	}
 }
 
-func (u *authUsecase) Login(req model.AuthLoginRequest) (*model.AuthLoginResponse, error) {
+func (u *authUsecase) Login(req *model.AuthLoginRequest) (*model.AuthLoginResponse, error) {
 	currentUser, err := u.userRepo.GetByEmail(req.Email, true)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (u *authUsecase) Login(req model.AuthLoginRequest) (*model.AuthLoginRespons
 	return response, nil
 }
 
-func (u *authUsecase) Register(req model.User) (*model.User, error) {
+func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 	// check user exist
 	currentUser, err := u.userRepo.GetByEmail(req.Email, false)
 	if err != nil {
@@ -66,7 +66,7 @@ func (u *authUsecase) Register(req model.User) (*model.User, error) {
 		return nil, err
 	}
 	// inst
-	newUser := model.User{
+	newUser := &model.User{
 		Provider:  req.Provider,
 		Email:     req.Email,
 		Password:  string(bytes),

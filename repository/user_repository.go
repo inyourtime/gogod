@@ -21,14 +21,14 @@ func NewUserRepository(c *mongo.Collection) domain.UserRepository {
 	}
 }
 
-func (r *userRepository) Create(user model.User) (*model.User, error) {
+func (r *userRepository) Create(user *model.User) (*model.User, error) {
 	result, err := r.col.InsertOne(context.TODO(), user)
 	if err != nil {
 		return nil, err
 	}
 	user.ID = result.InsertedID.(primitive.ObjectID)
 	user.Password = ""
-	return &user, nil
+	return user, nil
 }
 
 func (r *userRepository) GetByID(_id primitive.ObjectID, withPwd bool) (*model.User, error) {

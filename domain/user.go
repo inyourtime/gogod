@@ -7,7 +7,7 @@ import (
 )
 
 type UserRepository interface{
-	Create(user model.User) (*model.User, error)
+	Create(user *model.User) (*model.User, error)
 	GetByID(_id primitive.ObjectID, withPwd bool) (*model.User, error)
 	GetByEmail(email string, withPwd bool) (*model.User, error)
 }

@@ -11,7 +11,7 @@ type UserRepository struct {
 	mock.Mock
 }
 
-func (_m *UserRepository) Create(user model.User) (*model.User, error) {
+func (_m *UserRepository) Create(user *model.User) (*model.User, error) {
 	args := _m.Called()
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
