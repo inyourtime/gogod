@@ -3,6 +3,7 @@ package usecase
 import (
 	"gogod/domain"
 	"gogod/model"
+	"gogod/pkg/logger"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,6 +25,7 @@ func NewAuthUsecase(ar domain.AuthRepository, ur domain.UserRepository) domain.A
 func (u *authUsecase) Login(req *model.AuthLoginRequest) (*model.AuthLoginResponse, error) {
 	currentUser, err := u.userRepo.GetByEmail(req.Email, true)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	if currentUser == nil {
@@ -38,6 +40,7 @@ func (u *authUsecase) Login(req *model.AuthLoginRequest) (*model.AuthLoginRespon
 
 	token, err := u.authRepo.SignUserToken(currentUser)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -55,6 +58,7 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 	// check user exist
 	currentUser, err := u.userRepo.GetByEmail(req.Email, false)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	if currentUser != nil {
@@ -81,6 +85,7 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 	}
 	response, err := u.userRepo.Create(newUser)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	return response, nil

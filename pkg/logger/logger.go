@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"flag"
 	"gogod/config"
 	"os"
 
@@ -14,25 +15,24 @@ var logz *zap.Logger
 //
 // No parameters.
 // No return values.
-func NewLogger(cfg *config.Env) error {
-	dcCore := newDiscordCore(cfg)
+func init() {
+	dcCore := newDiscordCore()
 	csCore := newConsoleCore()
 	logz = zap.New(zapcore.NewTee(dcCore, csCore), zap.AddCaller(), zap.AddCallerSkip(1))
 
 	defer logz.Sync()
-	return nil
 }
 
-func newDiscordCore(cfg *config.Env) zapcore.Core {
+func newDiscordCore() zapcore.Core {
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "timestamp"
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.StacktraceKey = ""
 
-	return zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(&discordSink{webhookID: cfg.DiscordWebhook.ID, webhookToken: cfg.DiscordWebhook.Token}), zapcore.ErrorLevel)
+	return zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(&discordSink{}), zapcore.ErrorLevel)
 }
 
-func newConsoleCore() (errLvl zapcore.Core) {
+func newConsoleCore() zapcore.Core {
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "timestamp"
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -74,20 +74,21 @@ func Warn(message string, fields ...zap.Field) {
 // It also accepts an optional variadic parameter fields of type zap.Field.
 // The function does not return any value.
 func Error(message interface{}, fields ...zap.Field) {
-	switch v := message.(type) {
-	case error:
-		logz.Error(v.Error(), fields...)
-	case string:
-		logz.Error(v, fields...)
+	if flag.Lookup("test.v") == nil {
+		switch v := message.(type) {
+		case error:
+			logz.Error(v.Error(), fields...)
+		case string:
+			logz.Error(v, fields...)
+		}
 	}
 }
 
-type discordSink struct {
-	webhookID    string
-	webhookToken string
-}
+type discordSink struct{}
 
 func (s *discordSink) Write(p []byte) (n int, err error) {
-	go WebhookSend(s.webhookID, s.webhookToken, string(p))
+	if flag.Lookup("test.v") == nil {
+		go WebhookSend(config.ENV.DiscordWebhook.ID, config.ENV.DiscordWebhook.Token, string(p))
+	}
 	return len(p), nil
 }

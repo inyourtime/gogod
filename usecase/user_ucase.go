@@ -3,6 +3,7 @@ package usecase
 import (
 	"gogod/domain"
 	"gogod/model"
+	"gogod/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,6 +28,7 @@ func (u *userUsecase) GetProfile(id string) (*model.User, error) {
 	// retrive user
 	currentUser, err := u.userRepo.GetByID(objectID, false)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 	if currentUser == nil {

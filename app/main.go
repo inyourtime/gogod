@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"gogod/config"
+	"gogod/delivery/middleware"
 	"gogod/delivery/route"
 	"gogod/pkg/database"
-	"gogod/pkg/logger"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +16,6 @@ import (
 func main() {
 	// load config
 	cfg := config.LoadConfig()
-	_ = logger.NewLogger(cfg)
 
 	// connect database
 	mc := database.MongoDBConnect(cfg)
@@ -35,6 +34,7 @@ func main() {
 	app.Use(_flogger.New(_flogger.Config{
 		TimeZone: "Asia/Bangkok",
 	}))
+	app.Use(middleware.Recover())
 
 	// register route
 	route.SetupRoute(app)

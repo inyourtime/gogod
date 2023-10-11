@@ -3,6 +3,7 @@ package route
 import (
 	"gogod/config"
 	"gogod/delivery"
+	"gogod/delivery/middleware"
 	"gogod/pkg/database"
 	"gogod/repository"
 	"gogod/usecase"
@@ -25,4 +26,7 @@ func authRoute(router fiber.Router) {
 	authHandler := delivery.NewAuthHandler(authUcase)
 
 	auth.Post("/login", authHandler.Login)
+	auth.Get("/g", middleware.AuthGuard(), func(c *fiber.Ctx) error {
+		return c.JSON("pass")
+	})
 }
