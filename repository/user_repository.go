@@ -84,3 +84,14 @@ func (r *userRepository) All() ([]model.User, error) {
 	}
 	return users, nil
 }
+
+func (r *userRepository) UpdateOne(_id primitive.ObjectID, updateReq *model.UpdateUserRequest) error {
+	out, err := r.userCol().UpdateByID(context.TODO(), _id, bson.M{"$set": updateReq})
+	if err != nil {
+		return err
+	}
+	if out.MatchedCount == 0 {
+		return domain.ErrUserNotFound
+	}
+	return nil
+}

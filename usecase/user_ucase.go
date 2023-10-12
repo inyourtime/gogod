@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUsecase struct {
@@ -44,4 +45,31 @@ func (u *userUsecase) GetAllUser() ([]model.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (u *userUsecase) UpdateUser(id string, req *model.UpdateUserRequest) error {
+	// retrive object_id
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid object id")
+	}
+
+	if req.Password != "" {
+		// hash
+		bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+		if err != nil {
+			return err
+		}
+		req.Password = string(bytes)
+	}
+
+	err = u.userRepo.UpdateOne(objectID, req)
+	if err != nil {
+		if err == domain.ErrUserNotFound {
+			return fiber.NewError(fiber.StatusNotFound, err.Error())
+		}
+		logger.Error(err)
+		return err
+	}
+	return nil
 }

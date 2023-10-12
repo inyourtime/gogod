@@ -27,7 +27,7 @@ type User struct {
 	Password  string             `json:"password,omitempty" bson:"password,omitempty" validate:"required"`
 	Firstname string             `json:"firstname,omitempty" bson:"firstname" validate:"required"`
 	Lastname  string             `json:"lastname,omitempty" bson:"lastname" validate:"required"`
-	Avatar    string             `json:"avater,omitempty" bson:"avater,omitempty"`
+	Avatar    string             `json:"avatar,omitempty" bson:"avatar,omitempty"`
 	Role      roleType           `json:"role,omitempty" bson:"role"`
 	GoogleID  string             `json:"googleID,omitempty" bson:"googleId,omitempty"`
 	IsActive  bool               `json:"isActive,omitempty" bson:"isActive"`
@@ -73,4 +73,11 @@ type UserClaims struct {
 	ID    string `json:"user_id"`
 	Email string `json:"email"`
 	jwt.RegisteredClaims
+}
+
+type UpdateUserRequest struct {
+	Password  string `json:"password,omitempty" bson:"password,omitempty"`
+	Firstname string `json:"firstname,omitempty" bson:"firstname,omitempty"`
+	Lastname  string `json:"lastname,omitempty" bson:"lastname,omitempty"`
+	Avatar    string `json:"avatar,omitempty" bson:"avatar,omitempty"`
 }

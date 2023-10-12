@@ -42,3 +42,7 @@ func (_m *UserRepository) All() ([]model.User, error) {
 	}
 	return args.Get(0).([]model.User), args.Error(1)
 }
+
+func (_m *UserRepository) UpdateOne(_id primitive.ObjectID, updateReq *model.UpdateUserRequest) error {
+	return nil
+}

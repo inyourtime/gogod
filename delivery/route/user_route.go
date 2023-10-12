@@ -24,5 +24,6 @@ func userRoute(router fiber.Router) {
 	{
 		usr.Get("/", middleware.JwtGuard(), userHandler.GetAll)
 		usr.Get("/profile", middleware.JwtGuard(), userHandler.GetProfile)
+		usr.Patch("/profile", middleware.JwtGuard(), userHandler.UpdateUser)
 	}
 }
