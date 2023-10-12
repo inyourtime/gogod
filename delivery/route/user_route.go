@@ -1,8 +1,8 @@
 package route
 
 import (
-	"gogod/config"
 	"gogod/delivery"
+	"gogod/delivery/middleware"
 	"gogod/pkg/database"
 	"gogod/repository"
 	"gogod/usecase"
@@ -17,13 +17,12 @@ import (
 func userRoute(router fiber.Router) {
 	usr := router.Group("/user")
 
-	userCol := database.GetCollection(config.ENV, database.MC, "users")
-	userRepo := repository.NewUserRepository(userCol)
+	userRepo := repository.NewUserRepository(database.MC)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	userHandler := delivery.NewUserHandler(userUsecase)
 
-	_ = userHandler
-	usr.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON("user")
-	})
+	{
+		usr.Get("/", middleware.JwtGuard(), userHandler.GetAll)
+		usr.Get("/profile", middleware.JwtGuard(), userHandler.GetProfile)
+	}
 }

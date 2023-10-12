@@ -1,7 +1,6 @@
 package route
 
 import (
-	"gogod/config"
 	"gogod/delivery"
 	"gogod/delivery/middleware"
 	"gogod/pkg/database"
@@ -18,15 +17,21 @@ import (
 func authRoute(router fiber.Router) {
 	auth := router.Group("/auth")
 
-	userCol := database.GetCollection(config.ENV, database.MC, "users")
-	authRepo := repository.NewAuthRepository(userCol)
-	userRepo := repository.NewUserRepository(userCol)
+	authRepo := repository.NewAuthRepository(database.MC)
+	userRepo := repository.NewUserRepository(database.MC)
 
 	authUcase := usecase.NewAuthUsecase(authRepo, userRepo)
 	authHandler := delivery.NewAuthHandler(authUcase)
 
-	auth.Post("/login", authHandler.Login)
-	auth.Get("/g", middleware.AuthGuard(), func(c *fiber.Ctx) error {
-		return c.JSON("pass")
-	})
+	{
+		auth.Post("/login", authHandler.Login)
+		auth.Post("/register", authHandler.Register)
+		auth.Get("/test", middleware.JwtGuard(), func(c *fiber.Ctx) error {
+			return c.JSON(fiber.Map{
+				"user_id": c.Locals("user_id"),
+				"email":   c.Locals("email"),
+			})
+		})
+	}
+
 }

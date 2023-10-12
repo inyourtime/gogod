@@ -12,12 +12,12 @@ import (
 )
 
 type authRepository struct {
-	col *mongo.Collection
+	client *mongo.Client
 }
 
-func NewAuthRepository(c *mongo.Collection) domain.AuthRepository {
+func NewAuthRepository(c *mongo.Client) domain.AuthRepository {
 	return &authRepository{
-		col: c,
+		client: c,
 	}
 }
 

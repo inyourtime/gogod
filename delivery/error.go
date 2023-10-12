@@ -8,6 +8,7 @@ import (
 type validationErrResponse struct {
 	Field string `json:"field"`
 	Tag   string `json:"error"`
+	Value string `json:"value,omitempty"`
 }
 
 func FiberError(c *fiber.Ctx, err error) error {
@@ -17,7 +18,7 @@ func FiberError(c *fiber.Ctx, err error) error {
 	case validator.ValidationErrors:
 		var errs []validationErrResponse
 		for _, e := range err {
-			errs = append(errs, validationErrResponse{Field: e.Field(), Tag: e.Tag()})
+			errs = append(errs, validationErrResponse{Field: e.Field(), Tag: e.Tag(), Value: e.Param()})
 		}
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code":        fiber.StatusBadRequest,

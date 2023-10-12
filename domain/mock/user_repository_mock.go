@@ -34,3 +34,7 @@ func (_m *UserRepository) GetByEmail(email string, withPwd bool) (*model.User, e
 	}
 	return args.Get(0).(*model.User), args.Error(1)
 }
+
+func (_m *UserRepository) All() ([]model.User, error) {
+	return nil, nil
+}

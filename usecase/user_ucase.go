@@ -36,3 +36,12 @@ func (u *userUsecase) GetProfile(id string) (*model.User, error) {
 	}
 	return currentUser, nil
 }
+
+func (u *userUsecase) GetAllUser() ([]model.User, error) {
+	users, err := u.userRepo.All()
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return users, nil
+}
