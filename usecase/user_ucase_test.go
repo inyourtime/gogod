@@ -91,3 +91,73 @@ func TestGetProfile(t *testing.T) {
 		mockUserRepo.AssertExpectations(t)
 	})
 }
+
+func TestGellAll(t *testing.T) {
+	mockUsersRegistered := []model.User{
+		{
+			ID:        primitive.NewObjectID(),
+			Provider:  model.LocalProvider,
+			Email:     gofakeit.Email(),
+			Password:  gofakeit.Password(true, true, true, true, false, 10),
+			Firstname: gofakeit.FirstName(),
+			Lastname:  gofakeit.LastName(),
+			Role:      model.UserRole,
+			IsActive:  true,
+			CreatedAt: gofakeit.Date(),
+			UpdatedAt: gofakeit.Date(),
+		},
+		{
+			ID:        primitive.NewObjectID(),
+			Provider:  model.LocalProvider,
+			Email:     gofakeit.Email(),
+			Password:  gofakeit.Password(true, true, true, true, false, 10),
+			Firstname: gofakeit.FirstName(),
+			Lastname:  gofakeit.LastName(),
+			Role:      model.UserRole,
+			IsActive:  true,
+			CreatedAt: gofakeit.Date(),
+			UpdatedAt: gofakeit.Date(),
+		},
+	}
+
+	t.Run("Get all success", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("All").Return(mockUsersRegistered, nil)
+		u := usecase.NewUserUsecase(mockUserRepo)
+
+		result, err := u.GetAllUser()
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(mockUsersRegistered), len(result))
+		assert.Equal(t, mockUsersRegistered, result)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Get all: no user", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("All").Return([]model.User{}, nil)
+		u := usecase.NewUserUsecase(mockUserRepo)
+
+		result, err := u.GetAllUser()
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(result))
+		assert.Equal(t, []model.User{}, result)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("Get all: repo error", func(t *testing.T) {
+		mockUserRepo := new(mock.UserRepository)
+		mockUserRepo.On("All").Return(nil, errors.New("repo error"))
+		u := usecase.NewUserUsecase(mockUserRepo)
+
+		result, err := u.GetAllUser()
+
+		assert.Error(t, err)
+		assert.Nil(t, result)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+}
