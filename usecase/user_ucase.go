@@ -5,7 +5,6 @@ import (
 	"gogod/model"
 	"gogod/pkg/logger"
 
-	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +23,7 @@ func (u *userUsecase) GetProfile(id string) (*model.User, error) {
 	// retrive object_id
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid object id")
+		return nil, domain.ErrInvalidObjID
 	}
 	// retrive user
 	currentUser, err := u.userRepo.GetByID(objectID, false)
@@ -33,7 +32,7 @@ func (u *userUsecase) GetProfile(id string) (*model.User, error) {
 		return nil, err
 	}
 	if currentUser == nil {
-		return nil, fiber.ErrNotFound
+		return nil, domain.ErrUserNotFound
 	}
 	return currentUser, nil
 }
@@ -51,7 +50,7 @@ func (u *userUsecase) UpdateUser(id string, req *model.UpdateUserRequest) error 
 	// retrive object_id
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid object id")
+		return domain.ErrInvalidObjID
 	}
 
 	if req.Password != "" {
@@ -66,7 +65,7 @@ func (u *userUsecase) UpdateUser(id string, req *model.UpdateUserRequest) error 
 	err = u.userRepo.UpdateOne(objectID, req)
 	if err != nil {
 		if err == domain.ErrUserNotFound {
-			return fiber.NewError(fiber.StatusNotFound, err.Error())
+			return err
 		}
 		logger.Error(err)
 		return err

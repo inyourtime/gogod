@@ -6,7 +6,6 @@ import (
 	"gogod/pkg/logger"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -29,13 +28,13 @@ func (u *authUsecase) Login(req *model.AuthLoginRequest) (*model.AuthLoginRespon
 		return nil, err
 	}
 	if currentUser == nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Email or Password are not correct 🥲")
+		return nil, domain.ErrEmailPwdIncorrect
 	}
 
 	// check password
 	err = bcrypt.CompareHashAndPassword([]byte(currentUser.Password), []byte(req.Password))
 	if err != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Email or Password are not correct 🥲")
+		return nil, domain.ErrEmailPwdIncorrect
 	}
 
 	token, err := u.authRepo.SignUserToken(currentUser)
@@ -62,7 +61,7 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 		return nil, err
 	}
 	if currentUser != nil {
-		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "email already exist 😜")
+		return nil, domain.ErrEmailExist
 	}
 	// hash
 	bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)

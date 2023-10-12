@@ -1,7 +1,12 @@
 package domain
 
-import "errors"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 var (
-	ErrUserNotFound = errors.New("user not found")
+	ErrUserNotFound      = fiber.NewError(fiber.StatusNotFound, "User not found")
+	ErrInvalidObjID      = fiber.NewError(fiber.StatusBadRequest, "Invalid object id")
+	ErrEmailPwdIncorrect = fiber.NewError(fiber.StatusUnauthorized, "Email or Password are not correct 🥲")
+	ErrEmailExist        = fiber.NewError(fiber.StatusUnprocessableEntity, "Email already exist 😜")
 )
