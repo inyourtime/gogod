@@ -74,21 +74,23 @@ func Warn(message string, fields ...zap.Field) {
 // It also accepts an optional variadic parameter fields of type zap.Field.
 // The function does not return any value.
 func Error(message interface{}, fields ...zap.Field) {
-	if flag.Lookup("test.v") == nil {
-		switch v := message.(type) {
-		case error:
-			logz.Error(v.Error(), fields...)
-		case string:
-			logz.Error(v, fields...)
-		}
+	if flag.Lookup("test.v") != nil {
+		return
+	}
+	switch v := message.(type) {
+	case error:
+		logz.Error(v.Error(), fields...)
+	case string:
+		logz.Error(v, fields...)
 	}
 }
 
 type discordSink struct{}
 
 func (s *discordSink) Write(p []byte) (n int, err error) {
-	if flag.Lookup("test.v") == nil {
-		go WebhookSend(config.ENV.DiscordWebhook.ID, config.ENV.DiscordWebhook.Token, string(p))
+	if flag.Lookup("test.v") != nil {
+		return
 	}
+	go WebhookSend(config.ENV.DiscordWebhook.ID, config.ENV.DiscordWebhook.Token, string(p))
 	return len(p), nil
 }
