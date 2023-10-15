@@ -1,5 +1,5 @@
 dev:
-	nodemon --exec go run app/main.go --signal SIGTERM
+	nodemon --exec env-cmd -f .env go run app/main.go --signal SIGTERM
 test:
 	grc go test -v ./...
 build:

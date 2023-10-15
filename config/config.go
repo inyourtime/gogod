@@ -1,10 +1,7 @@
 package config
 
 import (
-	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 var ENV *Env
@@ -19,14 +16,6 @@ type Env struct {
 }
 
 func LoadConfig() *Env {
-	appEnv := os.Getenv("APP_ENV")
-
-	if appEnv != "prod" && appEnv != "dev" {
-		if err := godotenv.Load(); err != nil {
-			log.Fatal("Error loading .env file")
-		}
-	}
-
 	ENV = &Env{
 		App: &App{
 			ServerPort: os.Getenv("CONFIG_SERVERPORT"),
