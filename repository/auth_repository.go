@@ -23,7 +23,7 @@ func NewAuthRepository(c *mongo.Client) domain.AuthRepository {
 
 func (r *authRepository) SignUserToken(user *model.User) (*model.Token, error) {
 	claims := model.UserClaims{
-		ID:    user.ID.Hex(),
+		ID:    user.UserID,
 		Email: user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),

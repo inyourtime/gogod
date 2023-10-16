@@ -6,6 +6,7 @@ import (
 	"gogod/pkg/logger"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -70,6 +71,7 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 	}
 	// inst
 	newUser := &model.User{
+		UserID:    uuid.NewString(),
 		Provider:  req.Provider,
 		Email:     req.Email,
 		Password:  string(bytes),

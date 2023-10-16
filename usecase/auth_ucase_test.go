@@ -9,6 +9,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +21,7 @@ func TestLogin(t *testing.T) {
 	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
 	mockUser := model.User{
 		ID:        primitive.NewObjectID(),
+		UserID:    uuid.NewString(),
 		Provider:  model.LocalProvider,
 		Email:     mockEmail,
 		Password:  string(mockPasswordHash),
@@ -122,6 +124,7 @@ func TestRegister(t *testing.T) {
 	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
 	mockUserRegistered := model.User{
 		ID:        primitive.NewObjectID(),
+		UserID:    uuid.NewString(),
 		Provider:  mockProvider,
 		Email:     mockEmail,
 		Password:  string(mockPasswordHash),

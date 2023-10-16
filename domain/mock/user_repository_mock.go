@@ -4,7 +4,6 @@ import (
 	"gogod/model"
 
 	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserRepository struct {
@@ -19,7 +18,7 @@ func (_m *UserRepository) Create(user *model.User) (*model.User, error) {
 	return args.Get(0).(*model.User), args.Error(1)
 }
 
-func (_m *UserRepository) GetByID(_id primitive.ObjectID, withPwd bool) (*model.User, error) {
+func (_m *UserRepository) GetByID(userID string, withPwd bool) (*model.User, error) {
 	args := _m.Called()
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -43,6 +42,6 @@ func (_m *UserRepository) All() ([]model.User, error) {
 	return args.Get(0).([]model.User), args.Error(1)
 }
 
-func (_m *UserRepository) UpdateOne(_id primitive.ObjectID, updateReq *model.UpdateUserRequest) error {
+func (_m *UserRepository) UpdateOne(userID string, updateReq *model.UpdateUserRequest) error {
 	return nil
 }

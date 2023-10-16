@@ -23,7 +23,6 @@ func (h *authHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(req); err != nil {
 		return FiberError(c, fiber.NewError(fiber.StatusBadRequest, err.Error()))
 	}
-
 	if err := validator.New().Struct(req); err != nil {
 		return FiberError(c, err)
 	}

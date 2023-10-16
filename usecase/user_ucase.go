@@ -5,7 +5,6 @@ import (
 	"gogod/model"
 	"gogod/pkg/logger"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,13 +19,8 @@ func NewUserUsecase(ur domain.UserRepository) domain.UserUsecase {
 }
 
 func (u *userUsecase) GetProfile(id string) (*model.User, error) {
-	// retrive object_id
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, domain.ErrInvalidObjID
-	}
 	// retrive user
-	currentUser, err := u.userRepo.GetByID(objectID, false)
+	currentUser, err := u.userRepo.GetByID(id, false)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
@@ -47,12 +41,6 @@ func (u *userUsecase) GetAllUser() ([]model.User, error) {
 }
 
 func (u *userUsecase) UpdateUser(id string, req *model.UpdateUserRequest) error {
-	// retrive object_id
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return domain.ErrInvalidObjID
-	}
-
 	if req.Password != "" {
 		// hash
 		bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
@@ -62,7 +50,7 @@ func (u *userUsecase) UpdateUser(id string, req *model.UpdateUserRequest) error 
 		req.Password = string(bytes)
 	}
 
-	err = u.userRepo.UpdateOne(objectID, req)
+	err := u.userRepo.UpdateOne(id, req)
 	if err != nil {
 		if err == domain.ErrUserNotFound {
 			return err

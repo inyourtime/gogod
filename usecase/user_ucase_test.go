@@ -9,6 +9,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -16,6 +17,7 @@ import (
 
 func TestGetProfile(t *testing.T) {
 	mockID := primitive.NewObjectID()
+	mockUserID := uuid.NewString()
 	mockEmail := gofakeit.Email()
 	mockFirstname := gofakeit.FirstName()
 	mockLastname := gofakeit.LastName()
@@ -25,6 +27,7 @@ func TestGetProfile(t *testing.T) {
 	mockPasswordHash, _ := bcrypt.GenerateFromPassword([]byte(mockPassword), 10)
 	mockUserRegistered := model.User{
 		ID:        mockID,
+		UserID:    mockUserID,
 		Provider:  mockProvider,
 		Email:     mockEmail,
 		Password:  string(mockPasswordHash),
@@ -45,20 +48,6 @@ func TestGetProfile(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, mockUserRegistered, *result)
-
-		mockUserRepo.AssertExpectations(t)
-	})
-
-	t.Run("Get profile fail: invalid object id", func(t *testing.T) {
-		mockUserRepo := new(mock.UserRepository)
-		u := usecase.NewUserUsecase(mockUserRepo)
-
-		result, err := u.GetProfile(gofakeit.LetterN(20))
-
-		assert.Nil(t, result)
-		if assert.Error(t, err) && assert.ErrorIs(t, err, err.(*fiber.Error)) {
-			assert.Equal(t, fiber.StatusBadRequest, err.(*fiber.Error).Code)
-		}
 
 		mockUserRepo.AssertExpectations(t)
 	})
@@ -96,6 +85,7 @@ func TestGellAll(t *testing.T) {
 	mockUsersRegistered := []model.User{
 		{
 			ID:        primitive.NewObjectID(),
+			UserID:    uuid.NewString(),
 			Provider:  model.LocalProvider,
 			Email:     gofakeit.Email(),
 			Password:  gofakeit.Password(true, true, true, true, false, 10),
@@ -108,6 +98,7 @@ func TestGellAll(t *testing.T) {
 		},
 		{
 			ID:        primitive.NewObjectID(),
+			UserID:    uuid.NewString(),
 			Provider:  model.LocalProvider,
 			Email:     gofakeit.Email(),
 			Password:  gofakeit.Password(true, true, true, true, false, 10),

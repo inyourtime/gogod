@@ -8,7 +8,6 @@ import (
 	"gogod/pkg/database"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,18 +27,17 @@ func (r *userRepository) userCol() *mongo.Collection {
 }
 
 func (r *userRepository) Create(user *model.User) (*model.User, error) {
-	result, err := r.userCol().InsertOne(context.TODO(), user)
+	_, err := r.userCol().InsertOne(context.TODO(), user)
 	if err != nil {
 		return nil, err
 	}
-	user.ID = result.InsertedID.(primitive.ObjectID)
 	user.Password = ""
 	return user, nil
 }
 
-func (r *userRepository) GetByID(_id primitive.ObjectID, withPwd bool) (*model.User, error) {
+func (r *userRepository) GetByID(userID string, withPwd bool) (*model.User, error) {
 	user := model.User{}
-	filter := bson.D{{Key: "_id", Value: _id}}
+	filter := bson.D{{Key: "userId", Value: userID}}
 	project := options.FindOne()
 	if !withPwd {
 		project.SetProjection(bson.M{"password": 0})
@@ -85,8 +83,9 @@ func (r *userRepository) All() ([]model.User, error) {
 	return users, nil
 }
 
-func (r *userRepository) UpdateOne(_id primitive.ObjectID, updateReq *model.UpdateUserRequest) error {
-	out, err := r.userCol().UpdateByID(context.TODO(), _id, bson.M{"$set": updateReq})
+func (r *userRepository) UpdateOne(userID string, updateReq *model.UpdateUserRequest) error {
+	filter := bson.D{{Key: "userId", Value: userID}}
+	out, err := r.userCol().UpdateOne(context.TODO(), filter, bson.M{"$set": updateReq})
 	if err != nil {
 		return err
 	}
