@@ -32,6 +32,7 @@ func (r *blogRepository) Create(blog *model.Blog) error {
 	}
 	return nil
 }
+
 func (r *blogRepository) All() ([]model.Blog, error) {
 	filter := bson.D{}
 	cursor, err := r.blogCol().Find(context.TODO(), filter)
@@ -44,6 +45,7 @@ func (r *blogRepository) All() ([]model.Blog, error) {
 	}
 	return blogs, nil
 }
+
 func (r *blogRepository) GetByID(blogID string) (*model.Blog, error) {
 	blog := model.Blog{}
 	filter := bson.D{{Key: "blogId", Value: blogID}}
@@ -56,6 +58,7 @@ func (r *blogRepository) GetByID(blogID string) (*model.Blog, error) {
 	}
 	return &blog, nil
 }
+
 func (r *blogRepository) UpdateOne(blog *model.BlogUpdateRequest) error {
 	filter := bson.D{{Key: "blogId", Value: blog.BlogID}}
 	_, err := r.blogCol().UpdateOne(context.TODO(), filter, bson.M{"$set": blog})
@@ -64,6 +67,7 @@ func (r *blogRepository) UpdateOne(blog *model.BlogUpdateRequest) error {
 	}
 	return nil
 }
+
 func (r *blogRepository) Delete(blogID string) error {
 	filter := bson.D{{Key: "blogId", Value: blogID}}
 	_, err := r.blogCol().DeleteOne(context.TODO(), filter)

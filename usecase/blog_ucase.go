@@ -37,6 +37,7 @@ func (u *blogUsecase) CreateBlog(blog *model.Blog, createdBy model.CreatedBy) er
 	}
 	return nil
 }
+
 func (u *blogUsecase) GetAllBlogs() ([]model.Blog, error) {
 	blogs, err := u.blogRepo.All()
 	if err != nil {
@@ -45,6 +46,7 @@ func (u *blogUsecase) GetAllBlogs() ([]model.Blog, error) {
 	}
 	return blogs, nil
 }
+
 func (u *blogUsecase) GetBlog(blogID string) (*model.Blog, error) {
 	blog, err := u.blogRepo.GetByID(blogID)
 	if err != nil {
@@ -57,6 +59,7 @@ func (u *blogUsecase) GetBlog(blogID string) (*model.Blog, error) {
 
 	return blog, nil
 }
+
 func (u *blogUsecase) UpdateBlog(blog *model.BlogUpdateRequest, updatedBy string) error {
 	currentBlog, err := u.blogRepo.GetByID(blog.BlogID)
 	if err != nil {
@@ -78,6 +81,7 @@ func (u *blogUsecase) UpdateBlog(blog *model.BlogUpdateRequest, updatedBy string
 	}
 	return nil
 }
+
 func (u *blogUsecase) DeleteBlog(blogID string, deletedBy string) error {
 	currentBlog, err := u.blogRepo.GetByID(blogID)
 	if err != nil {
