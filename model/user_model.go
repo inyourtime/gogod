@@ -73,6 +73,7 @@ type Token struct {
 type UserClaims struct {
 	ID    string `json:"user_id"`
 	Email string `json:"email"`
+	Name  string `json:"name"`
 	jwt.RegisteredClaims
 }
 

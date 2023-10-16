@@ -23,6 +23,7 @@ func JwtGuard() fiber.Handler {
 			if claims, ok := c.Locals("user").(*jwt.Token).Claims.(jwt.MapClaims); ok {
 				c.Locals("user_id", claims["user_id"])
 				c.Locals("email", claims["email"])
+				c.Locals("name", claims["name"])
 			}
 			return c.Next()
 		},

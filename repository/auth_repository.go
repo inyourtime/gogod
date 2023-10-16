@@ -25,6 +25,7 @@ func (r *authRepository) SignUserToken(user *model.User) (*model.Token, error) {
 	claims := model.UserClaims{
 		ID:    user.UserID,
 		Email: user.Email,
+		Name:  user.Firstname + " " + user.Lastname,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

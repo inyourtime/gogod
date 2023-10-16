@@ -23,5 +23,6 @@ func SetupRoute(app *fiber.App) {
 	{
 		authRoute(api)
 		userRoute(api)
+		blogRoute(api)
 	}
 }
