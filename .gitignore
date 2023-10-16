@@ -9,3 +9,5 @@ tmp
 *.log
 
 server
+
+test_result/
