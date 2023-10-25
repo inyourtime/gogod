@@ -1,11 +1,14 @@
 package usecase
 
 import (
+	"gogod/config"
 	"gogod/domain"
 	"gogod/model"
 	"gogod/pkg/logger"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -90,6 +93,33 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 		return nil, err
 	}
 	return response, nil
+}
+
+func (u *authUsecase) Refresh(refreshToken string) (*model.Token, error) {
+	claim := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(refreshToken, &claim, func(t *jwt.Token) (interface{}, error) {
+		return []byte(config.ENV.Jwt.RefreshSecret), nil
+	})
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, err.Error())
+	}
+	userID := claim["user_id"].(string)
+	user, err := u.userRepo.GetByID(userID, false)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	if user == nil {
+		return nil, domain.ErrUserNotFound
+	}
+
+	token, err := u.authRepo.SignUserToken(user)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	return token, nil
 }
 
 func (u *authUsecase) Google(info model.GoogleInfo) (*model.AuthLoginResponse, error) {

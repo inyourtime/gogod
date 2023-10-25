@@ -26,6 +26,7 @@ func authRoute(router fiber.Router) {
 	{
 		auth.Post("/login", authHandler.Login)
 		auth.Post("/register", authHandler.Register)
+		auth.Post("/refresh", authHandler.Refresh)
 		auth.Get("/test", middleware.JwtGuard(), func(c *fiber.Ctx) error {
 			return c.JSON(fiber.Map{
 				"user_id": c.Locals("user_id"),

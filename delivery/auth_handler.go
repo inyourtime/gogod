@@ -57,6 +57,26 @@ func (h *authHandler) Register(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+func (h *authHandler) Refresh(c *fiber.Ctx) error {
+	type Refresh struct {
+		RefreshToken string `json:"refreshToken" validate:"required"`
+	}
+	req := new(Refresh)
+	if err := c.BodyParser(req); err != nil {
+		return FiberError(c, fiber.NewError(fiber.StatusBadRequest, err.Error()))
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return FiberError(c, err)
+	}
+
+	resp, err := h.authUsecase.Refresh(req.RefreshToken)
+	if err != nil {
+		return FiberError(c, err)
+	}
+	return c.JSON(resp)
+}
+
 func (h *authHandler) Google(c *fiber.Ctx) error {
 	url := config.GoogleLoginConfig.AuthCodeURL("randomstate")
 	c.Status(fiber.StatusSeeOther)

@@ -49,7 +49,8 @@ func LoadConfig() *Env {
 			Bucket:          os.Getenv("OBJECTSTORAGE_BUCKET"),
 		},
 		Jwt: &Jwt{
-			Secret: os.Getenv("JWT_SECRETKEY"),
+			Secret:        os.Getenv("JWT_SECRETKEY"),
+			RefreshSecret: os.Getenv("JWT_REFRESH_SECRET"),
 		},
 		Google: &Google{
 			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
@@ -86,7 +87,8 @@ type S3 struct {
 }
 
 type Jwt struct {
-	Secret string
+	Secret        string
+	RefreshSecret string
 }
 
 type Google struct {

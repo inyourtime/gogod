@@ -27,7 +27,7 @@ func (r *authRepository) SignUserToken(user *model.User) (*model.Token, error) {
 		Email: user.Email,
 		Name:  user.Firstname + " " + user.Lastname,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour /*1 * time.Minute*/)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "access_token",
@@ -47,7 +47,7 @@ func (r *authRepository) SignUserToken(user *model.User) (*model.Token, error) {
 	claims.RegisteredClaims.Issuer = "refresh_token"
 	claims.RegisteredClaims.Subject = "users_refresh_token"
 	refToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ssR, err := refToken.SignedString([]byte(config.ENV.Jwt.Secret))
+	ssR, err := refToken.SignedString([]byte(config.ENV.Jwt.RefreshSecret))
 	if err != nil {
 		return nil, err
 	}
