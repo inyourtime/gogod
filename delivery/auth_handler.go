@@ -1,8 +1,13 @@
 package delivery
 
 import (
+	"context"
+	"encoding/json"
+	"gogod/config"
 	"gogod/domain"
 	"gogod/model"
+	"io"
+	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -50,4 +55,49 @@ func (h *authHandler) Register(c *fiber.Ctx) error {
 		return FiberError(c, err)
 	}
 	return c.JSON(res)
+}
+
+func (h *authHandler) Google(c *fiber.Ctx) error {
+	url := config.GoogleLoginConfig.AuthCodeURL("randomstate")
+	c.Status(fiber.StatusSeeOther)
+	c.Redirect(url)
+	return c.JSON(url)
+}
+
+func (h *authHandler) GoogleCallback(c *fiber.Ctx) error {
+	state := c.Query("state")
+	if state != "randomstate" {
+		return c.SendString("States don't Match!!")
+	}
+
+	code := c.Query("code")
+
+	googleCon := config.GoogleLoginConfig
+
+	token, err := googleCon.Exchange(context.Background(), code)
+	if err != nil {
+		return c.SendString("Code-Token Exchange Failed")
+	}
+
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	if err != nil {
+		return c.SendString("User Data Fetch Failed")
+	}
+
+	userData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.SendString("JSON Parsing Failed")
+	}
+
+	info := model.GoogleInfo{}
+	if err := json.Unmarshal(userData, &info); err != nil {
+		return c.SendString("JSON Unmarshal Failed")
+	}
+
+	userResp, err := h.authUsecase.Google(info)
+	if err != nil {
+		return FiberError(c, err)
+	}
+
+	return c.JSON(userResp)
 }

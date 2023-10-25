@@ -83,3 +83,12 @@ type UpdateUserRequest struct {
 	Lastname  string `json:"lastname,omitempty" bson:"lastname,omitempty"`
 	Avatar    string `json:"avatar,omitempty" bson:"avatar,omitempty"`
 }
+
+type GoogleInfo struct {
+	ID         string `json:"id"`
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	GivenName  string `json:"given_name"`
+	FamilyName string `json:"family_name"`
+	Picture    string `json:"picture"`
+}

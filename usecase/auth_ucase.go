@@ -91,3 +91,54 @@ func (u *authUsecase) Register(req *model.User) (*model.User, error) {
 	}
 	return response, nil
 }
+
+func (u *authUsecase) Google(info model.GoogleInfo) (*model.AuthLoginResponse, error) {
+	currentUser, err := u.userRepo.GetByEmail(info.Email, false)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	if currentUser == nil {
+		newUser := &model.User{
+			UserID:    uuid.NewString(),
+			Provider:  model.GoogleProvider,
+			Email:     info.Email,
+			Password:  "",
+			Firstname: info.GivenName,
+			Lastname:  info.FamilyName,
+			Avatar:    info.Picture,
+			Role:      model.UserRole,
+			GoogleID:  info.ID,
+			IsActive:  true,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		currentUser, err = u.userRepo.Create(newUser)
+		if err != nil {
+			logger.Error(err)
+			return nil, err
+		}
+	} else {
+		if currentUser.GoogleID != info.ID {
+			return nil, domain.ErrEmailExist
+		}
+	}
+
+	token, err := u.authRepo.SignUserToken(currentUser)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
+	response := &model.AuthLoginResponse{
+		Email:     currentUser.Email,
+		Firstname: currentUser.Firstname,
+		Lastname:  currentUser.Lastname,
+		UpdatedAt: currentUser.UpdatedAt,
+		Token:     token,
+	}
+
+	return response, nil
+}

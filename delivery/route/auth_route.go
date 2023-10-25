@@ -32,6 +32,8 @@ func authRoute(router fiber.Router) {
 				"email":   c.Locals("email"),
 			})
 		})
+		auth.Get("/google", authHandler.Google)
+		auth.Get("/google/callback", authHandler.GoogleCallback)
 	}
 
 }

@@ -16,6 +16,7 @@ import (
 func main() {
 	// load config
 	cfg := config.LoadConfig()
+	_ = config.LoadGoogleConfig(cfg)
 
 	// connect database
 	mc := database.MongoDBConnect(cfg)
