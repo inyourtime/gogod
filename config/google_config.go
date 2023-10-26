@@ -9,7 +9,7 @@ var GoogleLoginConfig oauth2.Config
 
 func LoadGoogleConfig(cfg *Env) oauth2.Config {
 	GoogleLoginConfig = oauth2.Config{
-		RedirectURL:  "http://localhost:5050/api/auth/google/callback",
+		RedirectURL:  cfg.Google.Redirect,
 		ClientID:     cfg.Google.ClientID,
 		ClientSecret: cfg.Google.ClientSecret,
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},

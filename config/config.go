@@ -55,6 +55,7 @@ func LoadConfig() *Env {
 		Google: &Google{
 			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			Redirect:     os.Getenv("GOOGLE_REDIRECT"),
 		},
 	}
 	return ENV
@@ -94,4 +95,5 @@ type Jwt struct {
 type Google struct {
 	ClientID     string
 	ClientSecret string
+	Redirect     string
 }
