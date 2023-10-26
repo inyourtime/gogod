@@ -1,7 +1,7 @@
 FROM golang:1.20.7-alpine AS builder
 WORKDIR /go/src/app
 COPY . .
-RUN go get ./...
+RUN go mod download
 RUN go build -o /go/bin/server ./app
 
 FROM alpine

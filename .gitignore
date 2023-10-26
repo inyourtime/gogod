@@ -1,6 +1,5 @@
 *.env
 
-go.sum
 tmp
 *.sh
 
