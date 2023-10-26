@@ -14,6 +14,7 @@ func SetupRoute(app *fiber.App) {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"success": true,
 			"message": "Server is still OK 😛",
+			"change":  "update",
 		})
 	})
 
